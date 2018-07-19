@@ -1,0 +1,11 @@
+hash: d1c32f2382aa1838114fa93a75e2505fa0e4d549a3976518945213c06fe27b0f
+updated: 2018-07-19T12:59:02.37644182+02:00
+imports:
+- name: github.com/julienschmidt/httprouter
+  version: 348b672cd90d8190f8240323e372ecd1e66b59dc
+- name: github.com/kulpreet/txref
+  version: cb29358e918c6fa13f669ffff076a132a0ce4545
+  subpackages:
+  - bech32
+  - util
+testImports: []

@@ -1,0 +1,5 @@
+package: github.com/kulpreet/btcr-service
+import:
+- package: github.com/kulpreet/txref
+  version: extended
+- package: github.com/julienschmidt/httprouter
