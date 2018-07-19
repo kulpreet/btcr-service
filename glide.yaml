@@ -3,3 +3,4 @@ import:
 - package: github.com/kulpreet/txref
   version: extended
 - package: github.com/julienschmidt/httprouter
+- package: github.com/gorilla/websocket

@@ -22,9 +22,10 @@
 package main
 
 import (
-	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
+	
+	"github.com/julienschmidt/httprouter"
 )
 
 type Result struct {
@@ -37,7 +38,17 @@ type Result struct {
 
 func main() {
 	router := httprouter.New()
-    router.GET("/txref/:query/decode", decodeTxref)
+    router.GET("/txref/:query/decode", decodetxref)
+    router.GET("/txref/:query/txid", txref2txid)
+
+	openWebsocket()
+
+	// Get the current block count.
+	blockCount, err := BtcdClient.GetBlockCount()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("Connection established, block count: %v\n", blockCount)	
 	
-    log.Fatal(http.ListenAndServe(":8080", router))
+    log.Fatal(http.ListenAndServe(":8080", router))	
 }
