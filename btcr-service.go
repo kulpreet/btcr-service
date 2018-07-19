@@ -23,6 +23,7 @@ package main
 
 import (
 	"github.com/julienschmidt/httprouter"
+	"time"	
 	"log"
 	"net/http"
 )
@@ -35,9 +36,37 @@ type Result struct {
 	UtxoIndex int
 }
 
+var httpClient *http.Client
+
+const (
+    MaxIdleConnections int = 20
+    RequestTimeout     int = 5
+)
+
+const (
+	Username string = "jacktestnet"
+	Password string =  "111111"
+)
+func init() {
+    httpClient = createHTTPClient()
+}
+
+// createHTTPClient for connection re-use
+func createHTTPClient() *http.Client {
+    client := &http.Client{
+        Transport: &http.Transport{
+            MaxIdleConnsPerHost: MaxIdleConnections,
+        },
+        Timeout: time.Duration(RequestTimeout) * time.Second,
+    }
+
+    return client
+}
+
 func main() {
 	router := httprouter.New()
     router.GET("/txref/:query/decode", decodeTxref)
+    router.GET("/txref/:query/txid", getTxid)
 	
-    log.Fatal(http.ListenAndServe(":8080", router))
+    log.Fatal(http.ListenAndServe(":8080", router))	
 }

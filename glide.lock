@@ -1,6 +1,12 @@
-hash: d1c32f2382aa1838114fa93a75e2505fa0e4d549a3976518945213c06fe27b0f
-updated: 2018-07-19T12:59:02.37644182+02:00
+hash: 2e484a9662d4802606b59386b0dfa649a93526796ad8f137a7376bc57fdc4d14
+updated: 2018-07-19T18:47:01.635870249+02:00
 imports:
+- name: github.com/btcsuite/btcd
+  version: bc0944904505aab55e089371a892be2f87883161
+  subpackages:
+  - btcjson
+- name: github.com/gorilla/websocket
+  version: 5ed622c449da6d44c3c8329331ff47a9e5844f71
 - name: github.com/julienschmidt/httprouter
   version: 348b672cd90d8190f8240323e372ecd1e66b59dc
 - name: github.com/kulpreet/txref
