@@ -43,7 +43,9 @@ type config struct {
 	Password              string        `short:"p" long:"password" description:"Password for BTCD connections" required:"true"`
 	BtcdConnect           string        `long:"btcdconnect" description:"Host and post to connect to btcd at" required:"true"`
 	BtcdCert              string        `long:"btcdcert" description:"File containing the certificate file" required:"true"`
+	Listen                string        `short:"l" long:"listen" description:"Port to listen on for HTTP" required:"true"`	
 }
+
 var opts config
 
 func init() {
@@ -69,5 +71,5 @@ func main() {
 	}
 	log.Printf("Connection established, block count: %v\n", blockCount)	
 	
-    log.Fatal(http.ListenAndServe(":8080", router))	
+    log.Fatal(http.ListenAndServe(":" + opts.Listen, router))	
 }

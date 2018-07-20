@@ -47,8 +47,6 @@ func searchtransactions(writer http.ResponseWriter,
 	if err != nil {
 		log.Printf("Error finding tx %v\n", err)
 	}
-	log.Printf("Found tx %v\n", txs)
-	
 	
 	writer.Header().Set("Content-Type", "application/json")	
 	json.NewEncoder(writer).Encode(txs)
