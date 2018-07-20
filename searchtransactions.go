@@ -22,35 +22,34 @@
 package main
 
 import (
+	"encoding/json"
+	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
-	
-	"github.com/julienschmidt/httprouter"
+	"github.com/btcsuite/btcutil"
+	"github.com/btcsuite/btcd/chaincfg"
 )
 
-type Result struct {
-	Hrp string
-	Magic int
-	Height int
-	Position int
-	UtxoIndex int
-}
+func searchtransactions(writer http.ResponseWriter,
+	request *http.Request,
+	params httprouter.Params) {
 
-func main() {
-	router := httprouter.New()
-    router.GET("/txref/:query/decode", decodetxref)
-    router.GET("/txref/:query/txid", txref2txid)
-    router.GET("/tx/:query", gettx)
-	router.GET("/addr/:query/spends", searchtransactions)
+	query := params.ByName("query")
+	log.Printf("in address...%s", query)
 
-	openWebsocket()
-
-	// Get the current block count.
-	blockCount, err := BtcdClient.GetBlockCount()
+	addr, err := btcutil.DecodeAddress(query, &chaincfg.TestNet3Params)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Error getting address %v\n", err)		
 	}
-	log.Printf("Connection established, block count: %v\n", blockCount)	
+
+	var filtered []string
+	txs, err := BtcdClient.SearchRawTransactionsVerbose(addr, 0, 100, true, false, filtered)
+	if err != nil {
+		log.Printf("Error finding tx %v\n", err)
+	}
+	log.Printf("Found tx %v\n", txs)
 	
-    log.Fatal(http.ListenAndServe(":8080", router))	
+	
+	writer.Header().Set("Content-Type", "application/json")	
+	json.NewEncoder(writer).Encode(txs)
 }
