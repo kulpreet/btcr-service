@@ -30,27 +30,20 @@ import (
 	"github.com/btcsuite/btcutil"
 )
 
-const (
-	username string = "jacktestnet"
-	password string =  "111111"
-	rpcURL = "host.opdup.com:18443"
-	certFile = "rpc-opdup.cert"
-)
-
 var BtcdClient *rpcclient.Client
 
-func openWebsocket() {
+func openWebsocket(opts config) {
 	// Connect to local btcd RPC server using websockets.
 	btcdHomeDir := btcutil.AppDataDir("btcd", false)
-	certs, err := ioutil.ReadFile(filepath.Join(btcdHomeDir, certFile))
+	certs, err := ioutil.ReadFile(filepath.Join(btcdHomeDir, opts.BtcdCert))
 	if err != nil {
 		log.Fatal(err)
 	}
 	connCfg := &rpcclient.ConnConfig{
-		Host:         rpcURL,
+		Host:         opts.BtcdConnect,
 		Endpoint:     "ws",
-		User:         username,
-		Pass:         password,
+		User:         opts.Username,
+		Pass:         opts.Password,
 		Certificates: certs,
 	}
 	client, err := rpcclient.New(connCfg, nil)
