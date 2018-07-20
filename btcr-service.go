@@ -40,6 +40,7 @@ func main() {
 	router := httprouter.New()
     router.GET("/txref/:query/decode", decodetxref)
     router.GET("/txref/:query/txid", txref2txid)
+    router.GET("/tx/:query", gettx)
 
 	openWebsocket()
 

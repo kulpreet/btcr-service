@@ -22,41 +22,30 @@
 package main
 
 import (
-	"io/ioutil"
+	"encoding/json"
+	"github.com/julienschmidt/httprouter"
+	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"log"
-	"path/filepath"
-
-	"github.com/btcsuite/btcd/rpcclient"
-	"github.com/btcsuite/btcutil"
+	"net/http"
 )
 
-const (
-	username string = "jacktestnet"
-	password string =  "111111"
-	rpcURL = "host.opdup.com:18443"
-	certFile = "rpc-opdup.cert"
-)
+func gettx(writer http.ResponseWriter,
+	request *http.Request,
+	params httprouter.Params) {
 
-var BtcdClient *rpcclient.Client
+	query := params.ByName("query")
+	log.Printf("in gettx...%s", query)
 
-func openWebsocket() {
-	// Connect to local btcd RPC server using websockets.
-	btcdHomeDir := btcutil.AppDataDir("btcd", false)
-	certs, err := ioutil.ReadFile(filepath.Join(btcdHomeDir, certFile))
+	hash, err := chainhash.NewHashFromStr(query)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Error getting tx hash %v\n", err)
 	}
-	connCfg := &rpcclient.ConnConfig{
-		Host:         rpcURL,
-		Endpoint:     "ws",
-		User:         username,
-		Pass:         password,
-		Certificates: certs,
-	}
-	client, err := rpcclient.New(connCfg, nil)
+	tx, err := BtcdClient.GetRawTransactionVerbose(hash)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Error finding tx %v\n", err)
 	}
+	log.Printf("Found tx %v\n", tx)
 
-	BtcdClient = client
+	writer.Header().Set("Content-Type", "application/json")	
+	json.NewEncoder(writer).Encode(tx)
 }
