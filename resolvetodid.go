@@ -24,35 +24,53 @@ package main
 import (
 	"encoding/json"
 	"github.com/julienschmidt/httprouter"
-	"github.com/btcsuite/btcd/chaincfg/chainhash"
-	"github.com/btcsuite/btcd/btcjson"
 	"log"
 	"net/http"
+	"strconv"
+	
+	txref "github.com/kulpreet/txref/util"
 )
 
-func GetTxFromId(txid string) (tx *btcjson.TxRawResult) {
-	hash, err := chainhash.NewHashFromStr(txid)
-	if err != nil {
-		log.Printf("Error getting tx hash %v\n", err)
-	}
-	tx, err = BtcdClient.GetRawTransactionVerbose(hash)
-	if err != nil {
-		log.Printf("Error finding tx %v\n", err)
-	}
-	log.Printf("Found tx %v\n", tx)
-	return
-}
-
-
-func gettx(writer http.ResponseWriter,
+func resolvetodid(writer http.ResponseWriter,
 	request *http.Request,
 	params httprouter.Params) {
 
-	query := params.ByName("query")
-	log.Printf("in gettx...%s", query)
-
-	tx := GetTxFromId(query)
+	var result = make(map[string]string)
 	
+	query := params.ByName("query")
+	log.Printf("resolving to did...%s", query)
+
+	_, _, Height, Position, UtxoIndex, err := txref.Decode(query)
+	if err != nil {
+		http.Error(writer, err.Error(), http.StatusInternalServerError)
+        return
+	}
+
+	blockHash, err := BtcdClient.GetBlockHash(int64(Height))
+	if err != nil {
+		log.Printf("Error finding blockhash %v\n", blockHash)
+	}
+	log.Printf("Found blockhash %v\n", blockHash)
+	
+	block, err := BtcdClient.GetBlockVerbose(blockHash)
+	if err != nil {
+		log.Printf("Error finding block %v\n", blockHash.String())
+	}
+
+	txid := block.Tx[Position]
+	result["txid"] = txid
+	result["utxo_index"] = strconv.Itoa(UtxoIndex)
+
+	log.Printf("Found tx: %v", txid)
+
+	tx := GetTxFromId(txid)
+
+	inputTxid := tx.Vin[0].Txid
+	inputUtxoIndex := tx.Vin[0].Vout
+
+	inputTx := GetTxFromId(inputTxid)
+	didAddrs := inputTx.Vout[inputUtxoIndex].ScriptPubKey.Addresses
+
 	writer.Header().Set("Content-Type", "application/json")	
-	json.NewEncoder(writer).Encode(tx)
+	json.NewEncoder(writer).Encode(didAddrs)
 }

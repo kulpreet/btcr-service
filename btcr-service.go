@@ -83,6 +83,7 @@ func main() {
     router.GET("/txref/:query/txid", txref2txid)
     router.GET("/tx/:query", gettx)
 	router.GET("/addr/:query/spends", searchtransactions)
+	router.GET("/txref/:query/resolve", resolvetodid)
 
 	openWebsocket(opts)
 
