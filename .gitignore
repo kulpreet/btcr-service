@@ -1,2 +1,4 @@
 vendor
 btcr-service
+config.ini
+btcd-opdup.cert

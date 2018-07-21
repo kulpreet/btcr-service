@@ -1,5 +1,5 @@
 hash: 6141b561bba8da20e9c1d732048ea77db4ea11e681b7db921493a4172be05b8f
-updated: 2018-07-20T05:52:07.540581593+02:00
+updated: 2018-07-21T14:00:37.656448908+02:00
 imports:
 - name: github.com/btcsuite/btcd
   version: bc0944904505aab55e089371a892be2f87883161
@@ -27,6 +27,8 @@ imports:
   version: 31079b6807923eb23992c421b114992b95131b55
 - name: github.com/gorilla/websocket
   version: 5ed622c449da6d44c3c8329331ff47a9e5844f71
+- name: github.com/jessevdk/go-flags
+  version: 1679536dcc895411a9f5848d9a0250be7856448c
 - name: github.com/julienschmidt/httprouter
   version: 348b672cd90d8190f8240323e372ecd1e66b59dc
 - name: github.com/kulpreet/txref

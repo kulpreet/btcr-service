@@ -39,23 +39,45 @@ type Result struct {
 }
 
 type config struct {
-	Username              string        `short:"u" long:"username" description:"Username for BTCD connections" required:"true"`
-	Password              string        `short:"p" long:"password" description:"Password for BTCD connections" required:"true"`
-	BtcdConnect           string        `long:"btcdconnect" description:"Host and post to connect to btcd at" required:"true"`
-	BtcdCert              string        `long:"btcdcert" description:"File containing the certificate file" required:"true"`
-	Listen                string        `short:"l" long:"listen" description:"Port to listen on for HTTP" required:"true"`	
+	Username              string        `short:"u" long:"username" description:"Username for BTCD connections"`
+	Password              string        `short:"p" long:"password" description:"Password for BTCD connections"`
+	BtcdConnect           string        `long:"btcdconnect" description:"Host and post to connect to btcd at"`
+	BtcdCert              string        `long:"btcdcert" description:"File containing the certificate file"`
+	Listen                string        `short:"l" long:"listen" description:"Port to listen on for HTTP"`
+	Config                string        `short:"C" long:"config" description:"Ini Config file" required:"true"`	
 }
 
 var opts config
 
-func init() {
-	_, err := flags.Parse(&opts)
-	if err != nil {
-		os.Exit(1)
-	}
+func loadConfig() {
+	
+	p := flags.NewParser(&opts, flags.Default)
+	
+	err := flags.NewIniParser(p).ParseFile("config.ini")
+    if err != nil {
+        log.Println(err)
+    }
+
+    _, err = p.Parse()
+    if err != nil {
+        log.Println(err)
+    }	
+	
 }
 
-func main() {	
+func main() {
+
+	loadConfig()
+
+	log.Printf("parsed: %v\n", opts)
+	if opts.Username == "" ||
+		opts.Password == "" ||
+		opts.BtcdConnect == "" ||
+		opts.Listen == "" {
+		log.Println("Missing configuration, please check your config.ini file")
+		os.Exit(1)
+	}
+	
 	router := httprouter.New()
     router.GET("/txref/:query/decode", decodetxref)
     router.GET("/txref/:query/txid", txref2txid)
