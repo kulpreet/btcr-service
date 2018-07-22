@@ -53,15 +53,16 @@ func loadConfig() {
 	
 	p := flags.NewParser(&opts, flags.Default)
 	
-	err := flags.NewIniParser(p).ParseFile("config.ini")
+    _, err := p.Parse()
+    if err != nil {
+        log.Println(err)
+		os.Exit(1)
+    }	
+
+	err = flags.NewIniParser(p).ParseFile(opts.Config)
     if err != nil {
         log.Println(err)
     }
-
-    _, err = p.Parse()
-    if err != nil {
-        log.Println(err)
-    }	
 	
 }
 

@@ -12,16 +12,23 @@ go build
 ./btcr-service
 ```
 
-## Txref to Txid
+## Resolve a BTCR DID
 
-### Decoding a Txref
+`https://localhost:8080/txref/<txref>/resolve`
+
+
+## Decoding a Txref
 
 `https://localhost:8080/txref/<TxRef>/decode`
 
-### Getting Txid from Txref
+## Get Txid from Txref
 
 `https://localhost:8080/txref/<TxRef>/txid`
 
+## Get decoded Tx from Txid
+
+`https://localhost:8080/tx/<Txid>`
+
 ## Txid to UTXOs for the address in Txid
 
-
+`https://localhost:8080/addr/<addr>/spends`
