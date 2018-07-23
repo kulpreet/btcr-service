@@ -22,13 +22,29 @@
 package main
 
 import (
-	"encoding/json"
-	"github.com/julienschmidt/httprouter"
-	"log"
 	"net/http"
+	"encoding/json"
+	"log"
+
+	"github.com/btcsuite/btcd/btcjson"
 	"github.com/btcsuite/btcutil"
 	"github.com/btcsuite/btcd/chaincfg"
+	"github.com/julienschmidt/httprouter"
 )
+
+func searchForAddr(query string) (txs []*btcjson.SearchRawTransactionsResult, err error) {
+	addr, err := btcutil.DecodeAddress(query, &chaincfg.TestNet3Params)
+	if err != nil {
+		log.Printf("Error getting address %v\n", err)		
+	}
+
+	var filtered []string
+	txs, err = BtcdClient.SearchRawTransactionsVerbose(addr, 0, 100, true, false, filtered)
+	if err != nil {
+		log.Printf("Error finding tx %v\n", err)
+	}
+	return
+}
 
 func searchtransactions(writer http.ResponseWriter,
 	request *http.Request,
@@ -37,17 +53,12 @@ func searchtransactions(writer http.ResponseWriter,
 	query := params.ByName("query")
 	log.Printf("in address...%s", query)
 
-	addr, err := btcutil.DecodeAddress(query, &chaincfg.TestNet3Params)
+	txs, err := searchForAddr(query)
 	if err != nil {
-		log.Printf("Error getting address %v\n", err)		
+		writer.Header().Set("Content-Type", "application/json")	
+		json.NewEncoder(writer).Encode(err)
 	}
-
-	var filtered []string
-	txs, err := BtcdClient.SearchRawTransactionsVerbose(addr, 0, 100, true, false, filtered)
-	if err != nil {
-		log.Printf("Error finding tx %v\n", err)
-	}
-	
+		
 	writer.Header().Set("Content-Type", "application/json")	
 	json.NewEncoder(writer).Encode(txs)
 }

@@ -22,12 +22,12 @@
 package main
 
 import (
-	"encoding/json"
-	"github.com/julienschmidt/httprouter"
-	"log"
 	"net/http"
+	"encoding/json"
+	"log"
 	"strconv"
 	
+	"github.com/julienschmidt/httprouter"
 	txref "github.com/kulpreet/txref/util"
 )
 

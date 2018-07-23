@@ -22,14 +22,25 @@
 package main
 
 import (
-	"encoding/json"
-	"github.com/julienschmidt/httprouter"
-	"log"
 	"net/http"
+	"encoding/json"
+	"log"
 	"strconv"
 	
+	"github.com/btcsuite/btcd/btcjson"
+	"github.com/julienschmidt/httprouter"
 	txref "github.com/kulpreet/txref/util"
 )
+
+func getDidAddressFromTx(tx *btcjson.TxRawResult) (didAddrs []string) {
+	// get DID address from input tx
+	inputTxid := tx.Vin[0].Txid
+	inputUtxoIndex := tx.Vin[0].Vout
+
+	inputTx := getTxFromTxid(inputTxid)
+	didAddrs = inputTx.Vout[inputUtxoIndex].ScriptPubKey.Addresses
+	return
+}
 
 func resolvetodid(writer http.ResponseWriter,
 	request *http.Request,
@@ -62,15 +73,24 @@ func resolvetodid(writer http.ResponseWriter,
 	result["utxo_index"] = strconv.Itoa(UtxoIndex)
 
 	log.Printf("Found tx: %v", txid)
+	
+	tx := getTxFromTxid(txid)
 
-	tx := GetTxFromId(txid)
+	didAddrs := getDidAddressFromTx(tx)
+	log.Printf("didAddrs: %v\n", didAddrs)
+	
+	// try to follow the tip
+	tipchain, err := followTipFromTx(tx, false)
+	if err != nil {
+		log.Printf("Error following tip %v\n", err)
+	}
 
-	inputTxid := tx.Vin[0].Txid
-	inputUtxoIndex := tx.Vin[0].Vout
-
-	inputTx := GetTxFromId(inputTxid)
-	didAddrs := inputTx.Vout[inputUtxoIndex].ScriptPubKey.Addresses
-
+	// // is the tip spent
+	// if tipSpent(tipchain) {
+	// } else {
+		
+	// }		
+	
 	writer.Header().Set("Content-Type", "application/json")	
-	json.NewEncoder(writer).Encode(didAddrs)
+	json.NewEncoder(writer).Encode(tipchain)
 }

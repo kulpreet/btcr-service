@@ -22,15 +22,16 @@
 package main
 
 import (
-	"encoding/json"
-	"github.com/julienschmidt/httprouter"
-	"github.com/btcsuite/btcd/chaincfg/chainhash"
-	"github.com/btcsuite/btcd/btcjson"
-	"log"
 	"net/http"
+	"encoding/json"
+	"log"
+
+	"github.com/btcsuite/btcd/btcjson"
+	"github.com/btcsuite/btcd/chaincfg/chainhash"
+	"github.com/julienschmidt/httprouter"
 )
 
-func GetTxFromId(txid string) (tx *btcjson.TxRawResult) {
+func getTxFromTxid(txid string) (tx *btcjson.TxRawResult) {
 	hash, err := chainhash.NewHashFromStr(txid)
 	if err != nil {
 		log.Printf("Error getting tx hash %v\n", err)
@@ -51,7 +52,7 @@ func gettx(writer http.ResponseWriter,
 	query := params.ByName("query")
 	log.Printf("in gettx...%s", query)
 
-	tx := GetTxFromId(query)
+	tx := getTxFromTxid(query)
 	
 	writer.Header().Set("Content-Type", "application/json")	
 	json.NewEncoder(writer).Encode(tx)

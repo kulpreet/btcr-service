@@ -22,12 +22,12 @@
 package main
 
 import (
-	"os"
-	"log"
 	"net/http"
+	"log"
+	"os"
 	
-	"github.com/julienschmidt/httprouter"
 	flags "github.com/jessevdk/go-flags"
+	"github.com/julienschmidt/httprouter"
 )
 
 type Result struct {
@@ -85,6 +85,7 @@ func main() {
     router.GET("/tx/:query", gettx)
 	router.GET("/addr/:query/spends", searchtransactions)
 	router.GET("/txref/:query/resolve", resolvetodid)
+	router.GET("/txref/:query/tip", tip)
 
 	openWebsocket(opts)
 

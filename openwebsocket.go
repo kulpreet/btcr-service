@@ -22,12 +22,12 @@
 package main
 
 import (
+	"path/filepath"
 	"io/ioutil"
 	"log"
-	"path/filepath"
 
-	"github.com/btcsuite/btcd/rpcclient"
 	"github.com/btcsuite/btcutil"
+	"github.com/btcsuite/btcd/rpcclient"
 )
 
 var BtcdClient *rpcclient.Client
